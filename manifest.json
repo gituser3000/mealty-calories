@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "Mealty calories",
+  "description": "Добавить отображение калорий и протеинов под корзину блюд на странице меню",
+  "version": "1.0.0",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.mealty.ru/catalog/"
+
+      ],
+      "js": ["content.js"]
+    }
+  ]
+}

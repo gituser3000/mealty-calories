@@ -80,7 +80,7 @@ function splitToSeparateBlock(calories, proteins, items, insertAfter){
 
     const splitted = document.createElement('div');
     splitted.appendChild(document.createElement('hr'))
-    splitted.appendChild(getDivWithNameAndContent(items.map(item=>item.name).join(', '), ''));
+    splitted.appendChild(getDivWithNameAndContent(items.map(item=>item.name+"("+item.count + ")").join(', '), ''));
     splitted.appendChild(getDivWithNameAndContent('Калории', calories));
     splitted.appendChild(getDivWithNameAndContent('Протеины', proteins));
     insertAfter.after(splitted);

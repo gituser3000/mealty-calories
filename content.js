@@ -27,10 +27,9 @@ function collectAndUpdateInfo(){
         name: item.querySelector('.basket__item-name').textContent,
         count: item.querySelector('input').value
     }));
-    const excluded = new Map(excludedFromCount);
 
     products.map(item=> ({
-        count: item.count - (excluded.get(item.name) || 0),
+        count: item.count - (excludedFromCount.get(item.name) || 0),
         name: item.name
     }))
         .filter(item=> item.count)
@@ -49,18 +48,14 @@ function collectAndUpdateInfo(){
 
 function updateInfo(sumCalories, sumProteins, items){
     document.querySelector('.basket__footer .addedInfo')?.remove();
-    const container = document.createElement('div');
-    container.classList.add('addedInfo');
 
-    const caloriesChild = getDivWithNameAndContent("Калории: ", Math.floor(sumCalories));
-    const proteinsChild = getDivWithNameAndContent("Протеины: ", Math.floor(sumProteins));
+    const container = getContainerWithAllInfo(sumCalories, sumProteins, items)
+    container.classList.add('addedInfo');
 
     const splitButton = document.createElement('button')
     splitButton.textContent = "Отделить";
     splitButton.addEventListener('click', ()=> splitToSeparateBlock(sumCalories, sumProteins, items, container));
 
-    container.appendChild(caloriesChild)
-    container.appendChild(proteinsChild)
     if (sumCalories) container.appendChild(splitButton)
 
     document.querySelector('.basket__footer').prepend(container);
@@ -72,16 +67,27 @@ function getDivWithNameAndContent(name, content){
     return item
 }
 
+function getContainerWithAllInfo(sumCalories, sumProteins, items){
+    const container = document.createElement('div');
+
+    const names = getDivWithNameAndContent(items.map(item=>item.name+"("+item.count + ")").join(', '), '');
+    const caloriesChild = getDivWithNameAndContent("Калории: ", Math.floor(sumCalories));
+    const proteinsChild = getDivWithNameAndContent("Протеины: ", Math.floor(sumProteins));
+
+    container.appendChild(names)
+    container.appendChild(caloriesChild)
+    container.appendChild(proteinsChild)
+    return container;
+}
+
 function splitToSeparateBlock(calories, proteins, items, insertAfter){
     items.forEach(item=>{
         const excludedCount = excludedFromCount.get(item.name);
         excludedFromCount.set(item.name, (excludedCount || 0) + item.count);
     });
 
-    const splitted = document.createElement('div');
-    splitted.appendChild(document.createElement('hr'))
-    splitted.appendChild(getDivWithNameAndContent(items.map(item=>item.name+"("+item.count + ")").join(', '), ''));
-    splitted.appendChild(getDivWithNameAndContent('Калории', calories));
-    splitted.appendChild(getDivWithNameAndContent('Протеины', proteins));
-    insertAfter.after(splitted);
+    const container = getContainerWithAllInfo(calories, proteins, items);
+    container.prepend(document.createElement('hr'))
+
+    insertAfter.after(container);
 }

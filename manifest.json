@@ -9,6 +9,7 @@
         "https://www.mealty.ru/catalog/"
 
       ],
+      "css": [ "main.css" ],
       "js": ["content.js"]
     }
   ]

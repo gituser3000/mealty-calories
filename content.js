@@ -1,22 +1,26 @@
-setInterval(()=>collectAndUpdateInfo(), 1000);
-
+const mealItems = resolveMealItems();
 let excludedFromCount = new Map();
 
-function getMealItems(){
+setInterval(()=>collectAndUpdateInfo(), 1000);
+
+function resolveMealItems(){
     return Array.from(document.querySelectorAll('.catalog-item')).map(item=>{
         const weight= +item.querySelector('.meal-card__weight').textContent;
-        return {
+        const data=  {
             name: item.querySelector('.meal-card__name').textContent,
             proteins: (+item.querySelector('.meal-card__proteins').textContent.replaceAll(',', "."))*weight/100,
             calories: (+item.querySelector('.meal-card__calories').textContent)*weight/100,
             fats: (+item.querySelector('.meal-card__fats').textContent.replaceAll(',', "."))*weight/100,
             carbohydrates: (+item.querySelector('.meal-card__carbohydrates').textContent.replaceAll(',', "."))*weight/100
         }
+
+        item.querySelector('.meal-card__name-note').parentNode.append(getContainerWithAllInfo(data.calories, data.proteins, data.fats, data.carbohydrates))
+
+        return data;
     })
 }
 
 function collectAndUpdateInfo(){
-    const mealItems = getMealItems();
     if (!mealItems || mealItems.length === 0) {
         updateInfo(0, 0);
         return;
@@ -54,6 +58,9 @@ function collectAndUpdateInfo(){
 
 function updateInfo(calories, proteins, fat, carbohydrates, items){
     document.querySelector('.basket__footer .addedInfo')?.remove();
+    if (!calories){
+        return;
+    }
 
     const container = getContainerWithAllInfo(calories, proteins, fat, carbohydrates, items)
     container.classList.add('addedInfo');
@@ -62,7 +69,7 @@ function updateInfo(calories, proteins, fat, carbohydrates, items){
     splitButton.textContent = "Отделить";
     splitButton.addEventListener('click', ()=> splitToSeparateBlock(calories, proteins, fat, carbohydrates, items, container));
 
-    if (calories) container.appendChild(splitButton)
+    container.appendChild(splitButton)
 
     document.querySelector('.basket__footer').prepend(container);
 }
@@ -76,13 +83,13 @@ function getDivWithNameAndContent(name, content){
 function getContainerWithAllInfo(calories, proteins, fat, carbohydrates, items){
     const container = document.createElement('div');
 
-    const names = getDivWithNameAndContent(items.map(item=>item.name+"("+item.count + ")").join(', '), '');
+    const names = items ? getDivWithNameAndContent(items.map(item=>item.name+"("+item.count + ")").join(', '), '') : null;
     const caloriesChild = getDivWithNameAndContent("Калории: ", Math.floor(calories));
     const proteinsChild = getDivWithNameAndContent("Белки: ", Math.floor(proteins));
     const fatChild = getDivWithNameAndContent("Жиры: ", Math.floor(fat));
     const carboHydratesChild = getDivWithNameAndContent("Углеводы: ", Math.floor(carbohydrates));
 
-    container.appendChild(names)
+    if (names) container.appendChild(names);
     container.appendChild(caloriesChild)
     container.appendChild(proteinsChild)
     container.appendChild(fatChild)

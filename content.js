@@ -57,7 +57,7 @@ function collectAndUpdateInfo(){
 }
 
 function updateInfo(calories, proteins, fat, carbohydrates, items){
-    document.querySelector('.basket__footer .addedInfo')?.remove();
+    document.querySelector('.basket__items .addedInfo')?.remove();
     if (!calories){
         return;
     }
@@ -71,7 +71,7 @@ function updateInfo(calories, proteins, fat, carbohydrates, items){
 
     container.appendChild(splitButton)
 
-    document.querySelector('.basket__footer').prepend(container);
+    document.querySelector('.basket__items').prepend(container);
 }
 
 function getDivWithNameAndContent(name, content){

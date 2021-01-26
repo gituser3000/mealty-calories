@@ -8,6 +8,7 @@ function resolveMealItems(){
         const weight= +item.querySelector('.meal-card__weight').textContent;
         const data=  {
             name: item.querySelector('.meal-card__name').textContent,
+            id: item.querySelector('.meal-card__offer_id').textContent,
             proteins: (+item.querySelector('.meal-card__proteins').textContent.replaceAll(',', "."))*weight/100,
             calories: (+item.querySelector('.meal-card__calories').textContent)*weight/100,
             fats: (+item.querySelector('.meal-card__fats').textContent.replaceAll(',', "."))*weight/100,
@@ -33,18 +34,19 @@ function collectAndUpdateInfo(){
 
     let products = Array.from(document.querySelectorAll('#cart_product_addable .basket__item')).map(item=>({
         name: item.querySelector('.basket__item-name').textContent,
-        count: item.querySelector('input').value
+        count: item.querySelector('input').value,
+        id: item.querySelector('.basket__item-controls').querySelectorAll('button')[1].getAttribute('data-product-id')
     }));
 
     products.map(item=> ({
-        count: item.count - (excludedFromCount.get(item.name) || 0),
-        name: item.name
+        count: item.count - (excludedFromCount.get(item.id) || 0),
+        name: item.name,
+        id: item.id
     }))
         .filter(item=> item.count)
         .forEach(product=>{
-            const name = product.name;
             items.push(product);
-            const meal = mealItems.find((item=> item.name === name));
+            const meal = mealItems.find((item=> item.id === product.id));
             if (meal){
                 sumCalories += meal.calories * product.count;
                 sumProteins += meal.proteins * product.count;
@@ -100,7 +102,7 @@ function getContainerWithAllInfo(calories, proteins, fat, carbohydrates, items){
 function splitToSeparateBlock(calories, proteins, fat, carbohydrates, items, insertAfter){
     items.forEach(item=>{
         const excludedCount = excludedFromCount.get(item.name);
-        excludedFromCount.set(item.name, (excludedCount || 0) + item.count);
+        excludedFromCount.set(item.id, (excludedCount || 0) + item.count);
     });
 
     const container = getContainerWithAllInfo(calories, proteins, fat, carbohydrates, items);
